@@ -3,7 +3,7 @@ numbers = [1, 2, 3, 4]
 product = 1
 for num in numbers:
     product *= num
-# product теперь равен 24
+
 
 #task 2
 s = input("Введите строку: ")
@@ -16,8 +16,8 @@ for c in s:
     elif c.islower():
         lower += 1
 
-print("Прописных:", upper)
-print("Строчных:", lower)
+print(upper)
+print(lower)
 
 
 #task 3
