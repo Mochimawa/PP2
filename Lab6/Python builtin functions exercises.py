@@ -1,36 +1,46 @@
 #task 1
-from functools import reduce
-import operator
-
-numbers = [1, 2, 3, 4, 5]
-result = reduce(operator.mul, numbers, 1)
-print("Произведение всех чисел:", result)
+numbers = [1, 2, 3, 4]
+product = 1
+for num in numbers:
+    product *= num
+# product теперь равен 24
 
 #task 2
-text = "Hello World"
-uppercase_count = sum(1 for c in text if c.isupper())
-lowercase_count = sum(1 for c in text if c.islower())
-print("Прописные буквы:", uppercase_count)
-print("Строчные буквы:", lowercase_count)
+s = input("Введите строку: ")
+upper = 0
+lower = 0
+
+for c in s:
+    if c.isupper():
+        upper += 1
+    elif c.islower():
+        lower += 1
+
+print("Прописных:", upper)
+print("Строчных:", lower)
+
 
 #task 3
-def is_palindrome(s):
-    cleaned = s.lower().replace(" ", "")
-    return cleaned == cleaned[::-1]
-
-print(is_palindrome("А роза упала на лапу Азора"))
+s = input("Введите строку: ")
+if s == s[::-1]:
+    print("Палиндром")
+else:
+    print("Не палиндром")
 
 #task 4
+import time
 import math
 import time
 
-n = 25100
-delay_ms = 2123
 
-time.sleep(delay_ms / 1000)
-print(f"Square root of {n} after {delay_ms} miliseconds is {math.sqrt(n)}")
+x = int(input())
+ms = int(input())
+
+time.sleep(ms / 1000)
+print(f"Square root of {x} after {ms} miliseconds is {math.sqrt(x)}")
 
 #task 5
-t = (True, 1, "non-empty", [1])
+t = (True, 1, "text")
 print(all(t))
+
 
