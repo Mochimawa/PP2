@@ -1,7 +1,7 @@
 #task 1
 import os
 
-path = '/ваш/путь'
+path = ' '
 
 print("Директории:")
 print([d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))])
@@ -16,18 +16,18 @@ print(os.listdir(path))
 #task 2
 import os
 
-path = '/ваш/путь'
+path = ' '
 
-print("Существует:", os.path.exists(path))
-print("Читаемый:", os.access(path, os.R_OK))
-print("Записываемый:", os.access(path, os.W_OK))
-print("Исполняемый:", os.access(path, os.X_OK))
+print(" ", os.path.exists(path))
+print(" ", os.access(path, os.R_OK))
+print(" ", os.access(path, os.W_OK))
+print(" ", os.access(path, os.X_OK))
 
 
 #task 3
 import os
 
-path = '/ваш/путь/файл.txt'
+path = 'файл.txt'
 
 if os.path.exists(path):
     print("Имя файла:", os.path.basename(path))
