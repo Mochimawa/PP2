@@ -18,20 +18,20 @@ running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            running = False
+            running = False 
       
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                if x - STEP >= 0:
-                    x -= STEP
-            elif event.key == pygame.K_RIGHT:
-                if x + STEP <= WIDTH - BALL_SIZE:
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_LEFT] and x - STEP >= 0:         
+                
+                x -= STEP
+        if keys[pygame.K_RIGHT] and x + STEP <= WIDTH - BALL_SIZE:
+              
                     x += STEP
-            elif event.key == pygame.K_UP:
-                if y - STEP >= 0:
+        if keys[pygame.K_UP] and y - STEP >=0:
+                
                     y -= STEP
-            elif event.key == pygame.K_DOWN:
-                if y + STEP <= HEIGHT - BALL_SIZE:
+        if keys[pygame.K_DOWN] and y + STEP <= HEIGHT - BALL_SIZE:
+               
                     y += STEP
 
     screen.fill(WHITE)

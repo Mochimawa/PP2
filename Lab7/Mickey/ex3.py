@@ -1,6 +1,6 @@
 import pygame
 from datetime import datetime
-import time
+
 
 pygame.init()
 
