@@ -57,9 +57,12 @@ class Enemy(pygame.sprite.Sprite):
 class Coin(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.image.load("coin.png") 
+        self.image = pygame.image.load("coin.png")
         self.rect = self.image.get_rect()
         self.rect.center = (random.randint(40, SCREEN_WIDTH - 40), 0)
+
+        # вес монеты 1–5
+        self.value = random.randint(1, 5)
 
     def move(self):
         self.rect.move_ip(0, SPEED)
