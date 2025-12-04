@@ -2,118 +2,45 @@ import psycopg2
 import csv
 from config import load_config
 
-def init_db():
-    commands = [
-        
-        """
+def create_table():
+    command = """
         CREATE TABLE IF NOT EXISTS phone_book (
             contact_id SERIAL PRIMARY KEY,
             first_name VARCHAR(255) NOT NULL,
             last_name VARCHAR(255),
             phone_number VARCHAR(20) NOT NULL UNIQUE
         )
-        """,
-        
-        """
-        CREATE OR REPLACE PROCEDURE add_or_update_contact(
-            p_first_name VARCHAR,
-            p_last_name VARCHAR,
-            p_phone_number VARCHAR
-        )
-        LANGUAGE plpgsql
-        AS $$
-        BEGIN
-            IF EXISTS (SELECT 1 FROM phone_book WHERE phone_number = p_phone_number) THEN
-                UPDATE phone_book 
-                SET first_name = p_first_name, 
-                    last_name = COALESCE(p_last_name, last_name)
-                WHERE phone_number = p_phone_number;
-            ELSE
-                INSERT INTO phone_book(first_name, last_name, phone_number)
-                VALUES (p_first_name, p_last_name, p_phone_number);
-            END IF;
-        END;
-        $$;
-        """,
-        """
-        CREATE OR REPLACE PROCEDURE insert_many_contacts(
-            p_names TEXT[],
-            p_phones TEXT[],
-            INOUT p_invalid_data TEXT[]
-        )
-        LANGUAGE plpgsql
-        AS $$
-        DECLARE
-            i INT;
-            len INT;
-            current_phone TEXT;
-        BEGIN
-            len := array_length(p_names, 1);
-            p_invalid_data := ARRAY[]::TEXT[];
-
-            FOR i IN 1..len LOOP
-                current_phone := p_phones[i];
-                
-                -- IF: 
-                IF length(current_phone) < 3 OR current_phone IS NULL THEN
-                    p_invalid_data := array_append(p_invalid_data, p_names[i] || ' (' || COALESCE(current_phone, 'None') || ')');
-                ELSE
-                    
-                    CALL add_or_update_contact(p_names[i], NULL, current_phone);
-                END IF;
-            END LOOP;
-        END;
-        $$;
-        """,
-        """
-        CREATE OR REPLACE PROCEDURE delete_contact_by_info(
-            p_identifier VARCHAR
-        )
-        LANGUAGE plpgsql
-        AS $$
-        BEGIN
-            DELETE FROM phone_book 
-            WHERE first_name = p_identifier OR phone_number = p_identifier;
-        END;
-        $$;
-        """
-    ]
+    """
     
     try:
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                for command in commands:
-                    cur.execute(command)
+                cur.execute(command)
                 conn.commit()
     except (psycopg2.DatabaseError, Exception) as error:
-        print(f"Database setup error: {error}")
+        print(f"Database error: {error}")
 
-def find_contacts_by_pattern():
-    pattern = input("\nEnter search pattern (part of name, surname, or phone): ")
-    sql = """
-        SELECT contact_id, first_name, last_name, phone_number 
-        FROM phone_book 
-        WHERE first_name ILIKE %s OR last_name ILIKE %s OR phone_number ILIKE %s
-    """
-    search_term = f"%{pattern}%"
-    
+def query_contacts():
+    filter_term = input("\nEnter name or phone to search (leave blank to show all): ")
+    if filter_term:
+        sql = "SELECT contact_id, first_name, last_name, phone_number FROM phone_book WHERE first_name ILIKE %s OR last_name ILIKE %s OR phone_number ILIKE %s"
+        params = (f"%{filter_term}%", f"%{filter_term}%", f"%{filter_term}%")
+    else:
+        sql = "SELECT contact_id, first_name, last_name, phone_number FROM phone_book ORDER BY first_name"
+        params = None
     try:
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                cur.execute(sql, (search_term, search_term, search_term))
+                cur.execute(sql, params)
                 rows = cur.fetchall()
-                
-                if not rows:
-                    print("No records found matching that pattern.")
+                if not rows: print("No contacts found.")
                 else:
-                    print(f"\nFound {len(rows)} record(s):")
-                    for row in rows:
-                        print(f"ID: {row[0]}, Name: {row[1]} {row[2] or ''}, Phone: {row[3]}")
-                        
-    except (psycopg2.DatabaseError, Exception) as error:
-        print(f"Search error: {error}")
+                    print("\n--- Search Results ---")
+                    for row in rows: print(f"ID: {row[0]}, Name: {row[1]} {row[2]}, Phone: {row[3]}")
+    except Exception as error:
+        print(f"Query failed: {error}")
 
 def upsert_contact():
     print("\nAdd or Update Contact:")
@@ -217,7 +144,7 @@ def delete_contact_proc():
         print(f"Delete error: {error}")
 
 def phone_book_menu():
-    init_db()
+    create_table()
     while True:
         print("\n--- Advanced Phone Book (PostgreSQL) ---")
         print("1. Find contacts (Pattern Search)")
@@ -229,7 +156,7 @@ def phone_book_menu():
         
         choice = input("Enter your choice: ").strip()
 
-        if choice == '1': find_contacts_by_pattern()
+        if choice == '1': query_contacts()
         elif choice == '2': upsert_contact()
         elif choice == '3': bulk_insert_contacts()
         elif choice == '4': query_with_pagination()
