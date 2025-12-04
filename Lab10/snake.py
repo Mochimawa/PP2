@@ -113,7 +113,7 @@ level = user_info[2]
 score = 0
 
 pygame.init()
-pygame.display.set_caption('Snake Game by Beisenbek')
+pygame.display.set_caption('Snake Game by Shyngg')
 game_window = pygame.display.set_mode((window_x, window_y))
 fps = pygame.time.Clock()
 
@@ -179,11 +179,18 @@ while True:
     if snake_position[0] < 0 or snake_position[0] > window_x - 10 or \
        snake_position[1] < 0 or snake_position[1] > window_y - 10:
         break 
+
+    game_over = False
     for block in snake_body[1:]:
         if snake_position[0] == block[0] and snake_position[1] == block[1]:
+            game_over = True
             break 
     for wall in levels[level]["walls"]:
         if wall.colliderect(pygame.Rect(snake_position[0], snake_position[1], 10, 10)):
+            game_over = True
+            break
+
+    if game_over:
             break
 
     score_font = pygame.font.SysFont('times new roman', 20)
