@@ -177,19 +177,20 @@ def query_with_pagination():
     except (psycopg2.DatabaseError, Exception) as error:
         print(f"Pagination query error: {error}")
 
-def delete_contact_proc():
-    identifier = input("\nEnter First Name or Phone Number to delete: ")
-    
+def delete_contact():
+    identifier = input("\nEnter first name or phone number to delete: ")
+    sql = "DELETE FROM phone_book WHERE first_name = %s OR phone_number = %s"
     try:
         config = load_config()
         with psycopg2.connect(**config) as conn:
             with conn.cursor() as cur:
-                
-                cur.execute("CALL delete_contact_by_info(%s)", (identifier,))
+                cur.execute(sql, (identifier, identifier))
                 conn.commit()
-        print("Delete procedure executed.")
-    except (psycopg2.DatabaseError, Exception) as error:
-        print(f"Delete error: {error}")
+                if cur.rowcount == 0: print("Contact not found.")
+                else: print(f"Successfully deleted {cur.rowcount} contact(s).")
+    except Exception as error:
+        print(f"Delete failed: {error}")
+
 
 def phone_book_menu():
     create_table()
@@ -208,7 +209,7 @@ def phone_book_menu():
         elif choice == '2':  update_contact()
         elif choice == '3': bulk_insert_contacts()
         elif choice == '4': query_with_pagination()
-        elif choice == '5': delete_contact_proc()
+        elif choice == '5': delete_contact()
         elif choice.lower() == 'exit':
             break
         else:
